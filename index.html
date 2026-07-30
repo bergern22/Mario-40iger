@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <!-- iOS: Telefonnummern-/Daten-Erkennung aus -->
+  <meta name="format-detection" content="telephone=no">
+
+  <title>Alles Gute zum Geburtstag!</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;600;700&family=Montserrat:wght@400;600;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg1: #0f172a;
+      --bg2: #1e293b;
+      --accent: #ffd36e;
+      --text: #f8fafc;
+      --card: rgba(255,255,255,0.10);
+      --glass: rgba(255,255,255,0.18);
+      --blur: saturate(180%) blur(8px);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      min-height: 100vh;
+      min-height: 100svh;
+      min-height: 100dvh;
+      background: radial-gradient(1200px 800px at 20% 10%, var(--bg2), var(--bg1));
+      color: var(--text);
+      font-family: "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
+      overflow: hidden;
+
+      /* Global: Auswahl/Callout verhindern, um „weiße Markierung“ zu vermeiden */
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    /* Auswahl überall unsichtbar machen (falls trotzdem getriggert) */
+    ::selection { background: transparent; color: inherit; }
+    ::-moz-selection { background: transparent; color: inherit; }
+
+    /* Hintergrund: fallende Zahlen */
+    .falling-wrap {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+      contain: strict;
+    }
+    .falling {
+      position: absolute;
+      top: -10dvh;
+      background: linear-gradient(160deg,#fff6c9 0%,#ffd36e 25%,#d4af37 55%,#b8860b 75%,#ffd36e 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      -webkit-text-stroke: 1px rgba(0, 0, 0, 0.35);
+      text-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.28),
+        0 0 10px rgba(212, 175, 55, 0.35);
+      animation-name: fall;
+      animation-timing-function: linear;
+      white-space: pre;
+      will-change: transform, opacity;
+      animation-play-state: var(--anim-play, running);
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    @keyframes fall {
+      0%   { transform: translateY(-10dvh) rotate(0deg);   opacity: 0; }
+      10%  { opacity: 0.7; }
+      90%  { opacity: 0.7; }
+      100% { transform: translateY(110dvh) rotate(12deg);  opacity: 0; }
+    }
+
+    /* Overlay/Karte (kleiner für mehr Hintergrund) */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(0,0,0,0.30);
+      z-index: 2;
+      animation: fadeIn 0.6s ease both;
+      min-height: 100vh;
+      min-height: 100svh;
+      min-height: 100dvh;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      padding: max(16px, env(safe-area-inset-top))
+               max(16px, env(safe-area-inset-right))
+               max(16px, env(safe-area-inset-bottom))
+               max(16px, env(safe-area-inset-left));
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .card {
+      width: min(640px, 84vw);
+      max-height: 78dvh;
+
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 18px;
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+      overflow: hidden;
+      margin-block: 8px;
+
+      display: flex;
+      flex-direction: column;
+
+      background-color: color-mix(in srgb, #0f172a 70%, rgba(255,255,255,0.10));
+      -webkit-background-clip: padding-box;
+      background-clip: padding-box;
+    }
+
+    .card-header {
+      padding: 18px 16px 8px;
+      background: linear-gradient(145deg, rgba(255, 204, 102, 0.14), rgba(255,255,255,0.06));
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .title {
+      margin: 4px 0 0 0;
+      font-size: clamp(22px, 7vw, 32px);
+      line-height: 1.25;
+      font-weight: 700;
+      text-align: center;
+      pointer-events: none;      /* verhindert Long-Press-Callouts */
+      -webkit-user-select: none; /* keine Auswahl */
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    /* Größere, responsiv skalierende „40.“ als SVG */
+    .age-svg {
+      display: inline-block;
+      vertical-align: baseline;
+      height: clamp(1.6em, 1em + 3vw, 2.6em); /* größer als Text */
+      aspect-ratio: 120 / 48;                 /* Breite passend zur Höhe */
+      translate: 0 0.12em;                    /* Baseline-Feinjustage */
+    }
+
+    .card-body {
+      padding: 10px 14px 6px;
+      line-height: 1.55;
+      font-size: 16px;
+      flex: 0 0 auto;
+      text-align: center;
+    }
+    .message {
+      font-size: clamp(17px, 4.5vw, 19px);
+      margin: 4px 0 0 0;
+    }
+
+    /* Kleinere Namenskästchen */
+    .signatures {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); /* vorher 120px */
+      gap: 10px;                                                  /* vorher 12px */
+      padding: 10px 12px 12px;                                    /* kompakter */
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      flex: 1 1 auto;
+      min-height: 100px;
+      contain: content;
+    }
+    .sig {
+      background: var(--glass);
+      border: 1px dashed rgba(255,255,255,0.22);
+      border-radius: 10px;       /* leicht kleiner */
+      padding: 8px 8px;          /* vorher 10px 10px */
+      display: grid;
+      place-items: center;
+      min-height: 50px;          /* vorher 58px */
+      transform: rotate(var(--rot, 0deg));
+      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+      content-visibility: auto;
+      contain-intrinsic-size: 80px 120px;
+    }
+    .sig-name {
+      font-family: "Dancing Script", "Segoe Script", "Brush Script MT", cursive;
+      font-size: clamp(18px, 3.6vw, 24px); /* vorher clamp(20px, 4vw, 28px) */
+      color: #fff;
+      text-shadow: 0 1px 0 rgba(0,0,0,0.25);
+      text-align: center;
+    }
+    .sig-note {
+      margin-top: 4px;
+      opacity: 0.7;
+      font-size: 11px;          /* vorher 12px */
+      text-align: center;
+    }
+
+    .footer {
+      padding: 10px 14px 14px;
+      opacity: 0.9;
+      font-size: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      flex: 0 0 auto;
+      gap: 8px;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      pointer-events: none;
+    }
+
+    /* Noch kompakter auf sehr kleinen Screens */
+    @media (max-width: 380px) {
+      .signatures { grid-template-columns: repeat(auto-fit, minmax(88px, 1fr)); gap: 8px; }
+      .sig { min-height: 46px; padding: 6px; }
+      .sig-name { font-size: clamp(16px, 4.2vw, 22px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .falling { animation: none !important; }
+    }
+
+    @media print {
+      .falling-wrap { display: none !important; }
+      .overlay { background: none; }
+      .card { box-shadow: none; border: 1px solid #ccc; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Hintergrund: fallende Zahlen -->
+  <div class="falling-wrap" id="fallingWrap" aria-hidden="true"></div>
+
+  <!-- Modale Grußkarte -->
+  <div class="overlay" id="overlay">
+    <article class="card" role="dialog" aria-labelledby="title" aria-modal="true">
+      <header class="card-header">
+        <h1 class="title" id="title" aria-label="Alles Gute zum vierzigsten Geburtstag, Lieber Mario!">
+          Alles Gute zum
+          <!-- Alter als SVG, nicht als Text (verhindert Markierung/Detektion) -->
+          <span class="age-svg" id="ageSvg" aria-hidden="true"></span>
+          Geburtstag, <span id="person">Lieber Mario</span>!
+        </h1>
+      </header>
+
+      <section class="card-body">
+        <p class="message" id="message">
+          Wir wünschen dir Gesundheit, Freude und viele unvergessliche Momente – schön, dass du Teil unseres Teams bist!
+        </p>
+      </section>
+
+      <section class="signatures" id="signatures" aria-label="Unterschriften der Kolleginnen und Kollegen">
+        <!-- Wird per JS gefüllt -->
+      </section>
+
+      <footer class="footer">
+        <div id="teamLabel">– Dein Team aus dem Büro Halle 5</div>
+      </footer>
+    </article>
+  </div>
+
+  <script>
+    // === Einstellungen ===
+    const age = 40; // Alter, steuert auch die fallenden Zahlen
+    const birthdayPerson = "Mario";
+    const message = "Wir wünschen dir Gesundheit, Freude und viele unvergessliche Momente – schön, dass du Teil unseres Teams bist!";
+    const teamName = "Dein Team aus dem Büro Halle 5";
+    const colleagues = [
+      "Natalie", "Toni", "Lois", "Wegi", "Andi", "Poid", "Klaus", "Alex",
+      "Daniel", "Tom", "Ossi", "Gerhard", "Heribert", "Harald", "Fritz", "Woif"
+    ];
+    const notesByName = {
+      // Optional: "Name": "Notiz"
+    };
+
+    // Faller-Anzahl
+    const isSmall = Math.min(window.innerWidth, window.innerHeight) < 480;
+    const fallingCount = isSmall ? 28 : 70;
+
+    // Texte setzen
+    document.getElementById("person").textContent = "Lieber " + birthdayPerson;
+    document.getElementById("message").textContent = message;
+    document.getElementById("teamLabel").textContent = "– " + teamName;
+
+    // Alter als SVG in den Titel rendern (verhindert Markierung/Callout)
+    function renderAgeSVG(n) {
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 48" width="100%" height="100%" role="img" aria-hidden="true">
+          <text x="0" y="36" font-family="Montserrat, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif"
+                font-size="36" font-weight="900" fill="${getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()}">
+            ${String(n)}.
+          </text>
+        </svg>`;
+      document.getElementById("ageSvg").innerHTML = svg;
+    }
+    renderAgeSVG(age);
+
+    // Unterschriften erzeugen
+    const sigWrap = document.getElementById("signatures");
+    const randRot = () => (Math.random() * 6 - 3).toFixed(2) + "deg";
+    const shuffle = a => a.sort(() => Math.random() - 0.5);
+    shuffle(colleagues).forEach(name => {
+      const box = document.createElement("div");
+      box.className = "sig";
+      box.style.setProperty("--rot", randRot());
+
+      const n = document.createElement("div");
+      n.className = "sig-name";
+      n.textContent = name;
+      box.appendChild(n);
+
+      if (notesByName[name]) {
+        const note = document.createElement("div");
+        note.className = "sig-note";
+        note.textContent = notesByName[name];
+        box.appendChild(note);
+      }
+      sigWrap.appendChild(box);
+    });
+
+    // Fallende Zahlen
+    const wrap = document.getElementById("fallingWrap");
+    const vw = () => Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    let viewportWidth = vw();
+
+    function makeFaller(i) {
+      const span = document.createElement("span");
+      span.className = "falling";
+      span.textContent = String(age); // visuell nur „40“, keine Interaktion
+      const left = Math.random() * viewportWidth;
+      const size = 18 + Math.random() * 48; // 18–66 px
+      const duration = 8 + Math.random() * 12; // 8–20 s
+      const delay = Math.random() * 12;
+      span.style.left = left + "px";
+      span.style.fontSize = size + "px";
+      span.style.animationDuration = duration + "s";
+      span.style.animationDelay = delay + "s";
+      span.setAttribute("aria-hidden", "true");
+      span.setAttribute("role", "presentation");
+      wrap.appendChild(span);
+
+      span.addEventListener("animationend", () => {
+        span.remove();
+        if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          makeFaller(i);
+        }
+      }, { passive: true });
+    }
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      for (let i = 0; i < fallingCount; i++) makeFaller(i);
+    }
+
+    // Resize
+    let resizeTO;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTO);
+      resizeTO = setTimeout(() => {
+        viewportWidth = vw();
+        if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          for (let i = 0; i < 6; i++) makeFaller(-1);
+        }
+      }, 150);
+    }, { passive: true });
+
+    // Konfetti: mehrere Bursts automatisch
+    // Parameter: bursts = Anzahl, interval = Abstand in ms, initialDelay = Startverzögerung in ms
+    function scheduleConfettiBursts({ bursts = 4, interval = 1200, initialDelay = 300 } = {}) {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      let done = 0;
+      const timers = [];
+      const start = () => {
+        timers.push(setTimeout(() => {
+          burstConfetti();
+          done++;
+          const id = setInterval(() => {
+            burstConfetti();
+            done++;
+            if (done >= bursts) {
+              clearInterval(id);
+            }
+          }, interval);
+          timers.push(id);
+        }, initialDelay));
+      };
+
+      // pausieren, wenn Tab unsichtbar ist
+      const onVis = () => {
+        const hidden = document.hidden;
+        document.documentElement.style.setProperty("--anim-play", hidden ? "paused" : "running");
+        if (hidden) {
+          timers.forEach(t => clearTimeout(t));
+          timers.length = 0;
+        } else if (done < bursts) {
+          start();
+        }
+      };
+      document.addEventListener("visibilitychange", onVis);
+
+      // Cleanup bei unload
+      window.addEventListener("beforeunload", () => {
+        timers.forEach(t => clearTimeout(t));
+        document.removeEventListener("visibilitychange", onVis);
+      }, { once: true });
+
+      start();
+    }
+
+    function burstConfetti() {
+      const colors = ["#ffcc66","#ffd699","#ffffff","#ffe599","#fff1cc"];
+      const count = isSmall ? 60 : 100;
+      for (let i = 0; i < count; i++) {
+        const c = document.createElement("div");
+        c.style.position = "fixed";
+        c.style.zIndex = 3;
+        c.style.top = (window.innerHeight * 0.4) + "px";
+        c.style.left = (window.innerWidth / 2) + "px";
+        c.style.width = "8px";
+        c.style.height = "14px";
+        c.style.background = colors[Math.floor(Math.random() * colors.length)];
+        c.style.opacity = "0.95";
+        c.style.transform = "translate(-50%, -50%) rotate(" + (Math.random()*360) + "deg)";
+        c.style.borderRadius = "2px";
+        c.style.pointerEvents = "none";
+        c.setAttribute("aria-hidden", "true");
+        c.setAttribute("role", "presentation");
+        document.body.appendChild(c);
+
+        const ang = (Math.random() * Math.PI * 2);
+        const vel = 6 + Math.random() * 8;
+        const vx = Math.cos(ang) * vel;
+        const vy0 = Math.sin(ang) * vel - 4;
+        let x = window.innerWidth / 2, y = window.innerHeight * 0.4;
+        let vy = vy0, life = 0, gravity = 0.22 + Math.random()*0.06;
+
+        const tick = () => {
+          life++;
+          x += vx;
+          y += vy;
+          vy += gravity;
+          c.style.transform = "translate(" + (x) + "px," + (y) + "px) rotate(" + (life*12) + "deg)";
+          if (life > 140 || y > window.innerHeight + 40) {
+            c.remove();
+          } else {
+            requestAnimationFrame(tick);
+          }
+        };
+        requestAnimationFrame(tick);
+      }
+    }
+
+    // Animationen pausieren, wenn Tab inaktiv (gilt auch für fallende Zahlen)
+    document.addEventListener("visibilitychange", () => {
+      const paused = document.hidden || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      document.documentElement.style.setProperty("--anim-play", paused ? "paused" : "running");
+    });
+
+    // Start: z. B. 4 Bursts, alle 1.2s, Start nach 300ms
+    window.addEventListener("DOMContentLoaded", () => {
+      scheduleConfettiBursts({ bursts: 4, interval: 1200, initialDelay: 300 });
+    }, { once: true });
+  </script>
+</body>
+</html>
