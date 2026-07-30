@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#0f172a" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -24,6 +24,11 @@
       --card: rgba(255,255,255,0.10);
       --glass: rgba(255,255,255,0.18);
       --blur: saturate(180%) blur(8px);
+
+      /* Basisabmessungen der Karte (nicht-responsiv) */
+      --base-w: 640; /* px */
+      --base-h: 520; /* px */
+      --scale: 1;
     }
 
     * { box-sizing: border-box; }
@@ -38,16 +43,16 @@
       color: var(--text);
       font-family: "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
       -webkit-tap-highlight-color: rgba(0,0,0,0);
       overflow: hidden;
 
-      /* Global: Auswahl/Callout verhindern, um „weiße Markierung“ zu vermeiden */
+      /* Auswahl verhindern (optisch ruhiger) */
       -webkit-user-select: none;
       user-select: none;
       -webkit-touch-callout: none;
     }
 
-    /* Auswahl überall unsichtbar machen (falls trotzdem getriggert) */
     ::selection { background: transparent; color: inherit; }
     ::-moz-selection { background: transparent; color: inherit; }
 
@@ -89,7 +94,7 @@
       100% { transform: translateY(110dvh) rotate(12deg);  opacity: 0; }
     }
 
-    /* Overlay/Karte */
+    /* Overlay-Hintergrund */
     .overlay {
       position: fixed;
       inset: 0;
@@ -101,9 +106,7 @@
       min-height: 100vh;
       min-height: 100svh;
       min-height: 100dvh;
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
+      overflow: hidden;
       padding: max(16px, env(safe-area-inset-top))
                max(16px, env(safe-area-inset-right))
                max(16px, env(safe-area-inset-bottom))
@@ -111,9 +114,22 @@
     }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+    /* Stage: fixierte Basisgröße, zentriert und skaliert */
+    .stage {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: calc(var(--base-w) * 1px);
+      height: calc(var(--base-h) * 1px);
+      transform: translate(-50%, -50%) scale(var(--scale));
+      transform-origin: center center;
+      will-change: transform;
+    }
+
+    /* Karte mit fester Pixelgröße (nicht responsiv) */
     .card {
-      width: min(640px, 84vw);
-      max-height: 92dvh; /* erhöht, damit die Karte höher wird */
+      width: calc(var(--base-w) * 1px);
+      height: calc(var(--base-h) * 1px);
       background: var(--card);
       border: 1px solid rgba(255,255,255,0.15);
       border-radius: 18px;
@@ -121,11 +137,8 @@
       -webkit-backdrop-filter: var(--blur);
       box-shadow: 0 12px 40px rgba(0,0,0,0.35);
       overflow: hidden;
-      margin-block: 8px;
-
       display: flex;
       flex-direction: column;
-
       background-color: color-mix(in srgb, #0f172a 70%, rgba(255,255,255,0.10));
       -webkit-background-clip: padding-box;
       background-clip: padding-box;
@@ -144,46 +157,46 @@
 
     .title {
       margin: 4px 0 0 0;
-      font-size: clamp(22px, 7vw, 32px);
+      font-size: 28px; /* fix in px */
       line-height: 1.25;
       font-weight: 700;
       text-align: center;
+      white-space: nowrap; /* hält die Zeile konstant */
       pointer-events: none;
       -webkit-user-select: none;
       user-select: none;
       -webkit-touch-callout: none;
     }
 
-    /* Alter als Text (statt SVG) */
+    /* Alter als Text (fixe Größe) */
     .age-text {
       display: inline-block;
       font-weight: 900;
-      font-size: clamp(28px, 6vw, 40px);
+      font-size: 36px; /* fix in px */
       color: var(--accent);
       text-shadow:
         0 1px 0 rgba(0,0,0,0.25),
         0 2px 6px rgba(0,0,0,0.28);
       margin: 0 2px;
       vertical-align: baseline;
-      transform: translateY(0.12em); /* leichte Baseline-Anpassung ähnlich wie zuvor */
+      transform: translateY(0.12em);
     }
 
     .card-body {
       padding: 10px 14px 6px;
       line-height: 1.55;
-      font-size: 16px;
+      font-size: 16px; /* fix in px */
       flex: 0 0 auto;
       text-align: center;
     }
     .message {
-      font-size: clamp(17px, 4.5vw, 19px);
+      font-size: 18px; /* fix in px */
       margin: 4px 0 0 0;
     }
 
-    /* Kleinere Namenskästchen */
     .signatures {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap: 10px;
       padding: 10px 12px 12px;
       overflow: auto;
@@ -208,7 +221,7 @@
     }
     .sig-name {
       font-family: "Dancing Script", "Segoe Script", "Brush Script MT", cursive;
-      font-size: clamp(18px, 3.6vw, 24px);
+      font-size: 22px; /* fix in px */
       color: #fff;
       text-shadow: 0 1px 0 rgba(0,0,0,0.25);
       text-align: center;
@@ -218,13 +231,6 @@
       opacity: 0.7;
       font-size: 11px;
       text-align: center;
-    }
-
-    /* Noch kompakter auf sehr kleinen Screens */
-    @media (max-width: 380px) {
-      .signatures { grid-template-columns: repeat(auto-fit, minmax(88px, 1fr)); gap: 8px; }
-      .sig { min-height: 46px; padding: 6px; }
-      .sig-name { font-size: clamp(16px, 4.2vw, 22px); }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -242,32 +248,32 @@
   <!-- Hintergrund: fallende Zahlen -->
   <div class="falling-wrap" id="fallingWrap" aria-hidden="true"></div>
 
-  <!-- Modale Grußkarte -->
+  <!-- Overlay + fix skalierte Stage -->
   <div class="overlay" id="overlay">
-    <article class="card" role="dialog" aria-labelledby="title" aria-modal="true">
-      <header class="card-header">
-        <h1 class="title" id="title" aria-label="Alles Gute zum vierzigsten Geburtstag, Lieber Mario!">
-          Alles Gute zum
-          <span class="age-text" id="ageText"></span>
-          Geburtstag, <span id="person">Lieber Mario</span>!
-        </h1>
-      </header>
+    <div class="stage" id="stage">
+      <article class="card" role="dialog" aria-labelledby="title" aria-modal="true">
+        <header class="card-header">
+          <h1 class="title" id="title" aria-label="Alles Gute zum vierzigsten Geburtstag, Lieber Mario!">
+            Alles Gute zum <span class="age-text" id="ageText"></span> Geburtstag, <span id="person">Lieber Mario</span>!
+          </h1>
+        </header>
 
-      <section class="card-body">
-        <p class="message" id="message">
-          Wir wünschen dir Gesundheit, Freude und viele unvergessliche Momente – schön, dass du Teil unseres Teams bist!
-        </p>
-      </section>
+        <section class="card-body">
+          <p class="message" id="message">
+            Wir wünschen dir Gesundheit, Freude und viele unvergessliche Momente – schön, dass du Teil unseres Teams bist!
+          </p>
+        </section>
 
-      <section class="signatures" id="signatures" aria-label="Unterschriften der Kolleginnen und Kollegen">
-        <!-- Wird per JS gefüllt -->
-      </section>
-    </article>
+        <section class="signatures" id="signatures" aria-label="Unterschriften der Kolleginnen und Kollegen">
+          <!-- Wird per JS gefüllt -->
+        </section>
+      </article>
+    </div>
   </div>
 
   <script>
     // === Einstellungen ===
-    const age = 40; // Alter, steuert auch die fallenden Zahlen
+    const age = 40;
     const birthdayPerson = "Mario";
     const message = "Wir wünschen dir Gesundheit, Freude und viele unvergessliche Momente – schön, dass du Teil unseres Teams bist!";
     const colleagues = [
@@ -282,7 +288,7 @@
     const isSmall = Math.min(window.innerWidth, window.innerHeight) < 480;
     const fallingCount = isSmall ? 28 : 70;
 
-    // Texte setzen
+    // Texte setzen (fixe Inhalte)
     document.getElementById("person").textContent = "Lieber " + birthdayPerson;
     document.getElementById("message").textContent = message;
     document.getElementById("ageText").textContent = String(age) + ".";
@@ -318,10 +324,10 @@
     function makeFaller(i) {
       const span = document.createElement("span");
       span.className = "falling";
-      span.textContent = String(age); // visuell nur „40“, keine Interaktion
+      span.textContent = String(age);
       const left = Math.random() * viewportWidth;
-      const size = 18 + Math.random() * 48; // 18–66 px
-      const duration = 8 + Math.random() * 12; // 8–20 s
+      const size = 18 + Math.random() * 48;
+      const duration = 8 + Math.random() * 12;
       const delay = Math.random() * 12;
       span.style.left = left + "px";
       span.style.fontSize = size + "px";
@@ -342,20 +348,34 @@
       for (let i = 0; i < fallingCount; i++) makeFaller(i);
     }
 
-    // Resize
-    let resizeTO;
+    // Stage skalieren, damit Karte immer gleich bleibt
+    function updateScale() {
+      const baseW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--base-w')) || 640;
+      const baseH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--base-h')) || 520;
+
+      // verfügbare Fläche abzügl. Overlay-Padding
+      const overlay = document.getElementById('overlay');
+      const cs = getComputedStyle(overlay);
+      const padX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+      const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+
+      const availW = window.innerWidth - padX;
+      const availH = window.innerHeight - padY;
+
+      const scale = Math.min(availW / baseW, availH / baseH, 1); // nicht über 1 hinaus zoomen
+      document.documentElement.style.setProperty('--scale', scale.toString());
+    }
+
     window.addEventListener("resize", () => {
-      clearTimeout(resizeTO);
-      resizeTO = setTimeout(() => {
-        viewportWidth = vw();
-        if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-          for (let i = 0; i < 6; i++) makeFaller(-1);
-        }
-      }, 150);
+      updateScale();
+      // Bei Resize ein paar neue Faller hinzufügen
+      viewportWidth = vw();
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        for (let i = 0; i < 6; i++) makeFaller(-1);
+      }
     }, { passive: true });
 
     // Konfetti: mehrere Bursts automatisch
-    // Parameter: bursts = Anzahl, interval = Abstand in ms, initialDelay = Startverzögerung in ms
     function scheduleConfettiBursts({ bursts = 4, interval = 1200, initialDelay = 300 } = {}) {
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
@@ -376,7 +396,6 @@
         }, initialDelay));
       };
 
-      // pausieren, wenn Tab unsichtbar ist
       const onVis = () => {
         const hidden = document.hidden;
         document.documentElement.style.setProperty("--anim-play", hidden ? "paused" : "running");
@@ -389,7 +408,6 @@
       };
       document.addEventListener("visibilitychange", onVis);
 
-      // Cleanup bei unload
       window.addEventListener("beforeunload", () => {
         timers.forEach(t => clearTimeout(t));
         document.removeEventListener("visibilitychange", onVis);
@@ -441,14 +459,13 @@
       }
     }
 
-    // Animationen pausieren, wenn Tab inaktiv (gilt auch für fallende Zahlen)
     document.addEventListener("visibilitychange", () => {
       const paused = document.hidden || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       document.documentElement.style.setProperty("--anim-play", paused ? "paused" : "running");
     });
 
-    // Start: z. B. 4 Bursts, alle 1.2s, Start nach 300ms
     window.addEventListener("DOMContentLoaded", () => {
+      updateScale();
       scheduleConfettiBursts({ bursts: 4, interval: 1200, initialDelay: 300 });
     }, { once: true });
   </script>
