@@ -89,7 +89,7 @@
       100% { transform: translateY(110dvh) rotate(12deg);  opacity: 0; }
     }
 
-    /* Overlay/Karte (kleiner für mehr Hintergrund) */
+    /* Overlay/Karte */
     .overlay {
       position: fixed;
       inset: 0;
@@ -113,8 +113,7 @@
 
     .card {
       width: min(640px, 84vw);
-      max-height: 78dvh;
-
+      max-height: 92dvh; /* erhöht, damit die Karte höher wird */
       background: var(--card);
       border: 1px solid rgba(255,255,255,0.15);
       border-radius: 18px;
@@ -149,19 +148,24 @@
       line-height: 1.25;
       font-weight: 700;
       text-align: center;
-      pointer-events: none;      /* verhindert Long-Press-Callouts */
-      -webkit-user-select: none; /* keine Auswahl */
+      pointer-events: none;
+      -webkit-user-select: none;
       user-select: none;
       -webkit-touch-callout: none;
     }
 
-    /* Größere, responsiv skalierende „40.“ als SVG */
-    .age-svg {
+    /* Alter als Text (statt SVG) */
+    .age-text {
       display: inline-block;
+      font-weight: 900;
+      font-size: clamp(28px, 6vw, 40px);
+      color: var(--accent);
+      text-shadow:
+        0 1px 0 rgba(0,0,0,0.25),
+        0 2px 6px rgba(0,0,0,0.28);
+      margin: 0 2px;
       vertical-align: baseline;
-      height: clamp(1.6em, 1em + 3vw, 2.6em); /* größer als Text */
-      aspect-ratio: 120 / 48;                 /* Breite passend zur Höhe */
-      translate: 0 0.12em;                    /* Baseline-Feinjustage */
+      transform: translateY(0.12em); /* leichte Baseline-Anpassung ähnlich wie zuvor */
     }
 
     .card-body {
@@ -179,9 +183,9 @@
     /* Kleinere Namenskästchen */
     .signatures {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); /* vorher 120px */
-      gap: 10px;                                                  /* vorher 12px */
-      padding: 10px 12px 12px;                                    /* kompakter */
+      grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+      gap: 10px;
+      padding: 10px 12px 12px;
       overflow: auto;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
@@ -192,11 +196,11 @@
     .sig {
       background: var(--glass);
       border: 1px dashed rgba(255,255,255,0.22);
-      border-radius: 10px;       /* leicht kleiner */
-      padding: 8px 8px;          /* vorher 10px 10px */
+      border-radius: 10px;
+      padding: 8px 8px;
       display: grid;
       place-items: center;
-      min-height: 50px;          /* vorher 58px */
+      min-height: 50px;
       transform: rotate(var(--rot, 0deg));
       box-shadow: 0 6px 16px rgba(0,0,0,0.25);
       content-visibility: auto;
@@ -204,7 +208,7 @@
     }
     .sig-name {
       font-family: "Dancing Script", "Segoe Script", "Brush Script MT", cursive;
-      font-size: clamp(18px, 3.6vw, 24px); /* vorher clamp(20px, 4vw, 28px) */
+      font-size: clamp(18px, 3.6vw, 24px);
       color: #fff;
       text-shadow: 0 1px 0 rgba(0,0,0,0.25);
       text-align: center;
@@ -212,7 +216,7 @@
     .sig-note {
       margin-top: 4px;
       opacity: 0.7;
-      font-size: 11px;          /* vorher 12px */
+      font-size: 11px;
       text-align: center;
     }
 
@@ -244,8 +248,7 @@
       <header class="card-header">
         <h1 class="title" id="title" aria-label="Alles Gute zum vierzigsten Geburtstag, Lieber Mario!">
           Alles Gute zum
-          <!-- Alter als SVG, nicht als Text (verhindert Markierung/Detektion) -->
-          <span class="age-svg" id="ageSvg" aria-hidden="true"></span>
+          <span class="age-text" id="ageText"></span>
           Geburtstag, <span id="person">Lieber Mario</span>!
         </h1>
       </header>
@@ -268,8 +271,8 @@
     const birthdayPerson = "Mario";
     const message = "Wir wünschen dir Gesundheit, Freude und viele unvergessliche Momente – schön, dass du Teil unseres Teams bist!";
     const colleagues = [
-      "Natalie", "Toni", "Fritz", "Tom B.", "Poid", "Andi", "Klaus", "Alois",
-      "Woif", "Tom R.", "Gerhard", "Heribert", "Daniel", "Alex", "Harald", "Mocki", "Ossi", "Wegi",
+      "Natalie", "Toni", "Lois", "Wegi", "Andi", "Poid", "Klaus", "Alex",
+      "Daniel", "Tom", "Ossi", "Gerhard", "Heribert", "Harald", "Fritz", "Woif"
     ];
     const notesByName = {
       // Optional: "Name": "Notiz"
@@ -282,19 +285,7 @@
     // Texte setzen
     document.getElementById("person").textContent = "Lieber " + birthdayPerson;
     document.getElementById("message").textContent = message;
-
-    // Alter als SVG in den Titel rendern (verhindert Markierung/Callout)
-    function renderAgeSVG(n) {
-      const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 48" width="100%" height="100%" role="img" aria-hidden="true">
-          <text x="0" y="36" font-family="Montserrat, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif"
-                font-size="36" font-weight="900" fill="${getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()}">
-            ${String(n)}.
-          </text>
-        </svg>`;
-      document.getElementById("ageSvg").innerHTML = svg;
-    }
-    renderAgeSVG(age);
+    document.getElementById("ageText").textContent = String(age) + ".";
 
     // Unterschriften erzeugen
     const sigWrap = document.getElementById("signatures");
